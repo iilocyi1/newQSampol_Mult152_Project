@@ -4,19 +4,20 @@ using UnityEngine;
 
 public class katanaSlash : MonoBehaviour
 {
-    public float attackRange = 1f;
     public int attackDamage = 50;
-    public Transform attackPoint;
-    public LayerMask enemyLayers;
     public Light attackFlashLight;
     public float flashDuration = 1f;
     private blockMechanic blockMechanic;
     public float attackCooldown = 0.75f; // Cooldown duration in seconds
     private bool canAttack = true; // Flag to check if attack is allowed
+    private Animator animator;
+    public static bool isAttacking = false; // Flag to indicate if an attack is in progress
+    private HashSet<Collider> hitEnemies = new HashSet<Collider>(); // Track hit enemies
 
     public void Start()
     {
         blockMechanic = GetComponent<blockMechanic>();
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -25,6 +26,7 @@ public class katanaSlash : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F) && canAttack && !blockMechanic.IsBlocking())
         {
             Slash();
+            animator.SetTrigger("Attack");
         }
     }
 
@@ -32,21 +34,20 @@ public class katanaSlash : MonoBehaviour
     {
         StartCoroutine(FlashLight());
         StartCoroutine(AttackCooldown());
+        hitEnemies.Clear(); // Clear the set at the start of each attack
+        isAttacking = true; // Set the flag to true when the attack starts
+    }
 
-        // Detect enemies in range of the attack
-        Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, attackRange, enemyLayers);
-
-        // Damage them
-        foreach (Collider enemy in hitEnemies)
+    void OnTriggerEnter(Collider other)
+    {
+        if (isAttacking && other.CompareTag("Enemy") && !hitEnemies.Contains(other))
         {
-            if (enemy.CompareTag("Enemy"))
+            IDamageable damageable = other.GetComponent<IDamageable>();
+            if (damageable != null)
             {
-                IDamageable damageable = enemy.GetComponent<IDamageable>();
-                if (damageable != null)
-                {
-                    damageable.TakeDamage(attackDamage);
-                    Debug.Log("Slash attack hit!");
-                }
+                damageable.TakeDamage(attackDamage);
+                hitEnemies.Add(other); // Add the enemy to the set
+                Debug.Log("Slash attack hit!");
             }
         }
     }
@@ -63,13 +64,13 @@ public class katanaSlash : MonoBehaviour
         canAttack = false;
         yield return new WaitForSeconds(attackCooldown);
         canAttack = true;
+        isAttacking = false; // Reset the flag after the cooldown
     }
 
     void OnDrawGizmosSelected()
     {
-        if (attackPoint == null)
-            return;
-
-        Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+        // Optional: Visualize the collider in the editor
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireMesh(GetComponent<MeshCollider>().sharedMesh, transform.position, transform.rotation);
     }
 }

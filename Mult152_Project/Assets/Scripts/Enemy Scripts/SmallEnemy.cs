@@ -9,7 +9,7 @@ public class SmallEnemy : MonoBehaviour, IDamageable
     public float maxHealth = 50f;
     private float currentHealth;
     public GameObject knifePrefab;
-    public float throwCooldown = 2f;
+    public float throwCooldown = 2.5f;
     private bool canThrow = true;
     private NavMeshAgent agent;
     private Transform player;

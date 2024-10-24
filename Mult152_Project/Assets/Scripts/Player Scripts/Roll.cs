@@ -9,11 +9,12 @@ public class Roll : MonoBehaviour
     private bool isInvulnerable = false;
     private bool canRoll = true; // Flag to check if roll is available
     public float rollSpeedMultiplier = 10.0f; // Speed multiplier for rolling
-
+    private Animator animator;
     // Start is called before the first frame update
     void Start()
     {
-
+        animator = GetComponent<Animator>();
+        animator.SetBool("canRoll", true);
     }
 
     // Update is called once per frame
@@ -23,6 +24,7 @@ public class Roll : MonoBehaviour
         {
             // Using coroutine to handle the timing of the invulnerability and cooldown
             StartCoroutine(Dodge());
+           
         }
     }
 
@@ -32,6 +34,9 @@ public class Roll : MonoBehaviour
         float rollSpeed = rollSpeedMultiplier;
         float rollDuration = rollDistance / rollSpeed;
         float elapsedTime = 0f;
+        animator.SetTrigger("Roll");
+        animator.SetBool("canRoll", false);
+        animator.SetBool("IsDodging", true);
 
         // Make the character invulnerable
         isInvulnerable = true;
@@ -46,10 +51,13 @@ public class Roll : MonoBehaviour
         // Make the character vulnerable again
         isInvulnerable = false;
 
+        animator.SetBool("IsDodging", false);
+
         // Start the cooldown
         canRoll = false;
         yield return new WaitForSeconds(rollCooldown);
         canRoll = true;
+        animator.SetBool("canRoll", true);
     }
 
     private void OnCollisionEnter(Collision collision)

@@ -12,7 +12,6 @@ public class katanaSlash : MonoBehaviour
     private bool canAttack = true; // Flag to check if attack is allowed
     private Animator animator;
     public static bool isAttacking = false; // Flag to indicate if an attack is in progress
-    private HashSet<Collider> hitEnemies = new HashSet<Collider>(); // Track hit enemies
 
     public void Start()
     {
@@ -34,22 +33,41 @@ public class katanaSlash : MonoBehaviour
     {
         StartCoroutine(FlashLight());
         StartCoroutine(AttackCooldown());
-        hitEnemies.Clear(); // Clear the set at the start of each attack
         isAttacking = true; // Set the flag to true when the attack starts
-    }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (isAttacking && other.CompareTag("Enemy") && !hitEnemies.Contains(other))
+        // Find the closest enemy
+        Collider closestEnemy = FindClosestEnemy();
+        if (closestEnemy != null)
         {
-            IDamageable damageable = other.GetComponent<IDamageable>();
+            IDamageable damageable = closestEnemy.GetComponent<IDamageable>();
             if (damageable != null)
             {
                 damageable.TakeDamage(attackDamage);
-                hitEnemies.Add(other); // Add the enemy to the set
-                Debug.Log("Slash attack hit!");
+                Debug.Log("Slash attack hit the closest enemy!");
             }
         }
+    }
+
+    Collider FindClosestEnemy()
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1f); // Adjust the radius as needed
+        Collider closestEnemy = null;
+        float closestDistance = Mathf.Infinity;
+
+        foreach (Collider collider in hitColliders)
+        {
+            if (collider.CompareTag("Enemy"))
+            {
+                float distance = Vector3.Distance(transform.position, collider.transform.position);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestEnemy = collider;
+                }
+            }
+        }
+
+        return closestEnemy;
     }
 
     IEnumerator FlashLight()
@@ -71,6 +89,6 @@ public class katanaSlash : MonoBehaviour
     {
         // Optional: Visualize the collider in the editor
         Gizmos.color = Color.red;
-        Gizmos.DrawWireMesh(GetComponent<MeshCollider>().sharedMesh, transform.position, transform.rotation);
+        Gizmos.DrawWireSphere(transform.position, 1f); // Adjust the radius as needed
     }
 }

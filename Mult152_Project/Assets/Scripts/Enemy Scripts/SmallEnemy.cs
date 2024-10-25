@@ -2,76 +2,59 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Linq;
 
 public class SmallEnemy : MonoBehaviour, IDamageable
 {
     public float maxHealth = 50f;
     private float currentHealth;
-    public GameObject knifePrefab;
-    public float throwCooldown = 2.5f;
-    private bool canThrow = true;
     private NavMeshAgent agent;
     private Transform player;
-    public Transform spawnPoint; // Transform for the knife spawn point
+    private Animator animator;
+    public GameObject projectilePrefab; // Reference to the projectile prefab
+    public Transform knifeSpawnPoint; // Transform for the knife spawn point
+    private bool isAttacking = false; // Flag to manage attack cooldown
 
     void Start()
     {
         currentHealth = maxHealth;
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
-
-        // Ignore collisions with other enemies tagged as "Enemy"
-        Collider[] colliders = GetComponents<Collider>();
-        foreach (Collider collider in colliders)
-        {
-            Collider[] enemyColliders = GameObject.FindGameObjectsWithTag("Enemy")
-                .Select(go => go.GetComponent<Collider>())
-                .Where(c => c != null)
-                .ToArray();
-
-            foreach (Collider enemyCollider in enemyColliders)
-            {
-                Physics.IgnoreCollision(collider, enemyCollider);
-            }
-        }
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer <= 12f)
+        if (distanceToPlayer <= 12f && !isAttacking)
         {
             agent.SetDestination(player.position);
-            if (canThrow)
+            if (agent.remainingDistance <= agent.stoppingDistance)
             {
-                StartCoroutine(ThrowKnife());
+                StartCoroutine(PerformAttack());
             }
         }
+
+        // Set the Speed parameter based on the agent's velocity
+        animator.SetFloat("Speed", agent.velocity.magnitude);
     }
 
-    private IEnumerator ThrowKnife()
+    private IEnumerator PerformAttack()
     {
-        canThrow = false;
-        Vector3 direction = (player.position - transform.position).normalized;
-        Quaternion knifeRotation = Quaternion.LookRotation(direction);
-        Vector3 spawnPosition = spawnPoint != null ? spawnPoint.position : transform.position + direction * 1.5f;
-        GameObject knife = Instantiate(knifePrefab, spawnPosition, knifeRotation);
+        isAttacking = true; // Set attacking state
+        agent.isStopped = true; // Stop the agent
+        animator.SetTrigger("Kunai"); // Trigger the Kunai attack animation
+        yield return new WaitForSeconds(3f); // Wait for the attack cooldown
+        isAttacking = false; // Reset attacking state
+        agent.isStopped = false; // Resume the agent
+    }
 
-        // Ignore collisions between the knife and other enemies tagged as "Enemy"
-        Collider knifeCollider = knife.GetComponent<Collider>();
-        Collider[] enemyColliders = GameObject.FindGameObjectsWithTag("Enemy")
-            .Select(go => go.GetComponent<Collider>())
-            .Where(c => c != null)
-            .ToArray();
-
-        foreach (Collider enemyCollider in enemyColliders)
-        {
-            Physics.IgnoreCollision(knifeCollider, enemyCollider);
-        }
-
-        yield return new WaitForSeconds(throwCooldown);
-        canThrow = true;
+    // This method will be called by the animation event
+    public void Throw()
+    {
+        Debug.Log("Kunai instantiated!");
+        Vector3 spawnPosition = knifeSpawnPoint.position;
+        Quaternion spawnRotation = Quaternion.LookRotation(transform.forward); // Use enemy's forward direction
+        Instantiate(projectilePrefab, spawnPosition, spawnRotation);
     }
 
     public void TakeDamage(int damage)
@@ -88,5 +71,20 @@ public class SmallEnemy : MonoBehaviour, IDamageable
     {
         Debug.Log("SmallEnemy died!");
         gameObject.SetActive(false);
+    }
+
+    void OnAnimatorMove()
+    {
+        if (isAttacking)
+        {
+            // Override the agent's position to keep it rooted
+            agent.velocity = Vector3.zero;
+            transform.position = agent.nextPosition;
+        }
+    }
+
+    public bool IsAttacking()
+    {
+        return isAttacking;
     }
 }

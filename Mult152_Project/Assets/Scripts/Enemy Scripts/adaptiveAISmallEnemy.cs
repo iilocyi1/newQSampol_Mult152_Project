@@ -7,7 +7,7 @@ public class adaptiveAISmallEnemy : MonoBehaviour, IDamageable
 {
     public float maxHealth = 50f;
     private float currentHealth;
-    public float detectionRange = 5f;
+    public float detectionRange = 10f;
     public float damage = 10f;
     public Transform player;
     protected NavMeshAgent agent;

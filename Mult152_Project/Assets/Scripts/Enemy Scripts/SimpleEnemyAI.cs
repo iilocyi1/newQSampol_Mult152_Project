@@ -53,6 +53,7 @@ public class SimpleEnemyAI : MonoBehaviour, IDamageable
     private IEnumerator AttackCooldown()
     {
         isAttacking = true; // Set attacking state
+        
         yield return new WaitForSeconds(3f); // Wait for 3 seconds
         isAttacking = false; // Reset attacking state
     }

@@ -9,52 +9,43 @@ public class MiniMe : MonoBehaviour, IDamageable
     public float maxHealth = 400f;
     private float currentHealth;
 
-    public GameObject deathPrefab; // Prefab to instantiate upon death
-    public TMP_Text dialogueText; // Reference to TextMeshPro dialogue text UI
-    public GameObject dialoguePanel; // Reference to the dialogue panel UI
-    public GameObject projectilePrefab;
-    public Transform rockSpawnPoint;
+    public GameObject deathPrefab;
+    public TMP_Text dialogueText;
+    public GameObject dialoguePanel;
+    public GameObject projectilePrefab;  // Rock prefab
+    public Transform rockSpawnPoint;     // Where the rock spawns
 
-    public float attackRange = 1.25f;  // Range for melee attack
-    public float throwCooldown = 8f;  // Cooldown between throws
-    public float attackCooldown = 3f;  // Cooldown between attacks
+    public float attackRange = 1.5f;
+    public float throwRange = 5f;
+    public float throwCooldown = 8f;
+    public float attackCooldown = 3f;
 
     private bool isEnemy = false;
     private bool isDialogueActive = false;
-    private bool isAttacking = false;  // Tracks attack cooldown
-    private bool canThrow = true;  // Tracks throw cooldown
-    private bool canAttack = true;  // Tracks attack cooldown
+    private bool isAttacking = false;
+    private bool canAttack = true;
+    private bool canThrow = true;
 
     private NavMeshAgent agent;
     private Transform player;
     private Animator animator;
-    private Rigidbody rb;
     private BossEnemyDamagePlayer damagePlayerScript;
-    private bool wasInAttackAnimation = false;  // Tracks previous animation state
-
-    public bool IsAttacking
-    {
-        get { return isAttacking; }
-    }
 
     void Start()
     {
         currentHealth = maxHealth;
-        gameObject.tag = "NPC";  // Set tag to NPC
+        gameObject.tag = "NPC";
         dialogueText.text = "I carry the key to your final destination. Do you want to fight me? Press Y for Yes, N for No.";
-        dialoguePanel.SetActive(false);  // Hide dialogue initially
+        dialoguePanel.SetActive(false);
 
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody>() ?? gameObject.AddComponent<Rigidbody>();
-        rb.useGravity = true;
-        rb.isKinematic = false;
 
         damagePlayerScript = GetComponentInChildren<BossEnemyDamagePlayer>();
         if (damagePlayerScript != null)
         {
-            damagePlayerScript.enabled = false;  // Ensure the script is initially disabled
+            damagePlayerScript.enabled = false;
         }
     }
 
@@ -62,31 +53,23 @@ public class MiniMe : MonoBehaviour, IDamageable
     {
         HandleDialogue();
 
-        if (isEnemy && agent.isOnNavMesh && !isAttacking)
+        if (isEnemy && agent.isOnNavMesh)
         {
             float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-            if (canThrow)
+            if (distanceToPlayer <= attackRange && canAttack)
             {
-                Debug.Log("Preparing to throw");
-                animator.SetFloat("ThrowCooldown", throwCooldown);
-                animator.SetTrigger("Throw");
-                StartCoroutine(ThrowCooldownCoroutine());
+                StopAndAttack();
+            }
+            if (distanceToPlayer <= throwRange && canThrow)
+            {
+                PerformThrow();
             }
             else
             {
-                if (canAttack && distanceToPlayer <= attackRange)
-                {
-                    Debug.Log("Preparing to attack");
-                    animator.SetBool("canAttack", true);
-                    animator.SetTrigger("Attack");
-                    StartCoroutine(AttackCooldownCoroutine());
-                }
-                else
-                {
-                    animator.SetBool("canAttack", false);
-                    MoveTowardsPlayer();
-                }
+                agent.isStopped = false;
+                agent.SetDestination(player.position);
+                animator.SetBool("isWalking", true);  // Play walking animation
             }
 
             animator.SetFloat("Speed", agent.velocity.magnitude);
@@ -96,8 +79,57 @@ public class MiniMe : MonoBehaviour, IDamageable
         {
             Debug.LogWarning("NavMeshAgent is not on the NavMesh.");
         }
+    }
 
-        HandleAnimationState();  // Check if attack animation is active
+    private void StopAndAttack()
+    {
+        agent.isStopped = true;
+        animator.SetBool("isWalking", false);
+        animator.SetTrigger("Attack");
+        StartCoroutine(AttackCooldownCoroutine());
+    }
+
+    private void PerformThrow()
+    {
+        agent.isStopped = true;
+        animator.SetBool("isWalking", false);
+        animator.SetTrigger("Throw");
+        StartCoroutine(ThrowCooldownCoroutine());
+    }
+
+    public void RockThrow()  // Called by animation event
+    {
+        if (projectilePrefab != null && rockSpawnPoint != null && player != null)
+        {
+            GameObject rock = Instantiate(projectilePrefab, rockSpawnPoint.position, Quaternion.identity);
+            Rigidbody rockRb = rock.GetComponent<Rigidbody>();
+
+            if (rockRb != null)
+            {
+                // Calculate direction towards the player
+                Vector3 directionToPlayer = (player.position - rockSpawnPoint.position).normalized;
+                rockRb.AddForce(directionToPlayer * 10f, ForceMode.Impulse);  // Adjust force as needed
+            }
+        }
+    }
+
+    private IEnumerator AttackCooldownCoroutine()
+    {
+        isAttacking = true;
+        canAttack = false;
+        yield return new WaitForSeconds(attackCooldown);
+        isAttacking = false;
+        canAttack = true;
+      
+    }
+
+    private IEnumerator ThrowCooldownCoroutine()
+    {
+        canThrow = false;
+        animator.SetBool("canThrow", false);
+        yield return new WaitForSeconds(throwCooldown);
+        canThrow = true;
+        animator.SetBool("canThrow", true);
     }
 
     private void HandleDialogue()
@@ -118,88 +150,18 @@ public class MiniMe : MonoBehaviour, IDamageable
         }
     }
 
-    private void PerformAttack()
-    {
-        agent.ResetPath();  // Stop movement
-        animator.SetTrigger("Attack");  // Trigger attack animation
-        StartCoroutine(AttackCooldownCoroutine());  // Start attack cooldown
-    }
-
-    private void MoveTowardsPlayer()
-    {
-        agent.SetDestination(player.position);
-    }
-
-    private void HandleAnimationState()
-    {
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);  // Get current animation state
-        bool isInAttackAnimation = stateInfo.IsName("editable Great Sword Slash");
-
-        // Enable or disable the damage player script based on the attack animation state
-        if (damagePlayerScript != null && isInAttackAnimation != wasInAttackAnimation)
-        {
-            damagePlayerScript.enabled = isInAttackAnimation;
-            if (isInAttackAnimation)
-            {
-                Debug.Log("Script activated");
-            }
-            else
-            {
-                Debug.Log("Script deactivated");
-            }
-            wasInAttackAnimation = isInAttackAnimation;
-        }
-    }
-
     void BecomeEnemy()
     {
         isEnemy = true;
         isDialogueActive = false;
         dialoguePanel.SetActive(false);
         gameObject.tag = "Enemy";
-        animator.SetTrigger("Idle");
     }
 
     void StayAsNPC()
     {
         isDialogueActive = false;
         dialoguePanel.SetActive(false);
-        animator.SetTrigger("Idle");
-    }
-
-    private IEnumerator AttackCooldownCoroutine()
-    {
-        isAttacking = true;
-        canAttack = false;
-        animator.SetBool("canAttack", false);
-        yield return new WaitForSeconds(attackCooldown);  // Wait for attack cooldown
-        isAttacking = false;
-        canAttack = true;
-        animator.SetBool("canAttack", true);  // Reset the parameter
-    }
-
-    private IEnumerator ThrowCooldownCoroutine()
-    {
-        canThrow = false;
-        animator.SetBool("canThrow", false);
-        float elapsedTime = 0f;
-        while (elapsedTime < throwCooldown)
-        {
-            elapsedTime += Time.deltaTime;
-            animator.SetFloat("ThrowCooldown", throwCooldown - elapsedTime);
-            yield return null;
-        }
-        canThrow = true;
-        animator.SetBool("canThrow", true);
-    }
-
-    void OnAnimatorMove()
-    {
-        if (isAttacking)
-        {
-            agent.velocity = Vector3.zero;
-            transform.position = agent.nextPosition;
-        }
     }
 
     public void TakeDamage(int damage)
@@ -215,19 +177,12 @@ public class MiniMe : MonoBehaviour, IDamageable
         gameObject.SetActive(false);
     }
 
-    // Method to be called by the animation event
-    public void RockThrow()
+    void OnAnimatorMove()
     {
-        if (projectilePrefab != null && rockSpawnPoint != null && player != null)
+        if (isAttacking)
         {
-            GameObject rock = Instantiate(projectilePrefab, rockSpawnPoint.position, Quaternion.identity);
-            Rigidbody rockRb = rock.GetComponent<Rigidbody>();
-            if (rockRb != null)
-            {
-                // Calculate the direction from the enemy to the player
-                Vector3 directionToPlayer = (player.position - rockSpawnPoint.position).normalized;
-                rockRb.AddForce(directionToPlayer * 10f, ForceMode.Impulse); // Adjust the force as needed
-            }
+            agent.velocity = Vector3.zero;
+            transform.position = agent.nextPosition;
         }
     }
 }

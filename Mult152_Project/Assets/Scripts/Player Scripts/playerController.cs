@@ -23,6 +23,8 @@ public class playerController : MonoBehaviour
     public float fallMultiplier = 2.5f; // Multiplier to increase fall speed
     private PlayerInventory inventory;
     private Animator animator; // Reference to the Animator component
+    private AudioSource audiosource;
+    public AudioClip KnifeThrow;
 
     // Start is called before the first frame update
     void Start()
@@ -80,6 +82,7 @@ public class playerController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.G))
             {
                 animator.SetTrigger("KunaiThrow"); // Trigger the throw animation
+                audiosource.PlayOneShot(KnifeThrow, 4f);
             }
 
             // Trigger the roll animation

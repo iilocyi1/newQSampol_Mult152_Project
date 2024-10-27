@@ -12,11 +12,15 @@ public class katanaSlash : MonoBehaviour
     private bool canAttack = true; // Flag to check if attack is allowed
     private Animator animator;
     public static bool isAttacking = false; // Flag to indicate if an attack is in progress
+    public AudioClip hitSound;  // Audio clip to play when hitting an enemy
+    public AudioClip attackSound;
+    private AudioSource audioSource;
 
-    public void Start()
+    void Start()
     {
         blockMechanic = GetComponent<blockMechanic>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();  // Get the AudioSource component
     }
 
     // Update is called once per frame
@@ -26,6 +30,7 @@ public class katanaSlash : MonoBehaviour
         {
             Slash();
             animator.SetTrigger("Attack");
+            audioSource.PlayOneShot(attackSound);
         }
     }
 
@@ -44,6 +49,12 @@ public class katanaSlash : MonoBehaviour
             {
                 damageable.TakeDamage(attackDamage);
                 Debug.Log("Slash attack hit the closest enemy!");
+
+                // Play the hit sound
+                if (audioSource != null && hitSound != null)
+                {
+                    audioSource.PlayOneShot(hitSound, 4f);
+                }
             }
         }
     }

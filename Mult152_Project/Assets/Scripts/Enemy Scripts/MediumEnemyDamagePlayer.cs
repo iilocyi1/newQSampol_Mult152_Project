@@ -4,30 +4,42 @@ using UnityEngine;
 
 public class MediumEnemyDamagePlayer : MonoBehaviour
 {
-    public int attackDamage = 10;
-    private bool hasDamagedPlayer = false; // Flag to ensure player is damaged only once per attack
+    public int attackDamage = 10; // Damage to deal to the player
+    private Player playerInRange; // Store player reference when inside trigger
+
+    void Start()
+    {
+        // Initialization if needed
+    }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the other object has a Player component
+        // Check if the object is the player and store reference
         Player player = other.GetComponent<Player>();
-        SimpleEnemyAI enemyAI = GetComponentInParent<SimpleEnemyAI>();
-
-        if (player != null && enemyAI != null && enemyAI.IsAttacking() && !hasDamagedPlayer)
+        if (player != null)
         {
-            Debug.Log("Player hit!");
-            // Apply damage to the player
-            player.TakeDamage(attackDamage);
-            hasDamagedPlayer = true; // Ensure player is damaged only once per attack
+            playerInRange = player; // Store player reference
+            Debug.Log("Player entered the trigger.");
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        // Reset the damage flag when the player exits the trigger
+        // Clear player reference when they exit the trigger
         if (other.CompareTag("Player"))
         {
-            hasDamagedPlayer = false;
+            playerInRange = null; // Clear the reference
+            Debug.Log("Player exited the trigger.");
+        }
+    }
+
+    // Method to damage the player, called from the animation event
+    public void DamagePlayer()
+    {
+        if (playerInRange != null)
+        {
+            Debug.Log("Player hit! Applying damage.");
+            playerInRange.TakeDamage(attackDamage); // Damage the player
         }
     }
 }

@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 65874735520350660}
   - component: {fileID: -1087712492332266425}
   - component: {fileID: -1769339738170104953}
-  - component: {fileID: 2700963037307390728}
   - component: {fileID: -5798856259654425615}
   - component: {fileID: 3609089593160531322}
   m_Layer: 0
@@ -151,20 +150,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15f10f5d370399f4eaea2f6d0b2cf0d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2700963037307390728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1243832787074470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9be01efc62ea290429e56fa47fb19e5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackDamage: 20
-  KnifeHit: {fileID: 8300000, guid: a37f44cbf8c2a7443a3c361efa2f233a, type: 3}
 --- !u!54 &-5798856259654425615
 Rigidbody:
   m_ObjectHideFlags: 0

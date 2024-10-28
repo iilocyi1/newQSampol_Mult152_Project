@@ -25,6 +25,7 @@ public class MiniMe : MonoBehaviour, IDamageable
     private bool isAttacking = false;
     private bool canAttack = true;
     private bool canThrow = true;
+    private bool wasInAttackAnimation = false;  // Track previous animation state
 
     private NavMeshAgent agent;
     private Transform player;
@@ -61,7 +62,7 @@ public class MiniMe : MonoBehaviour, IDamageable
             {
                 StopAndAttack();
             }
-            if (distanceToPlayer <= throwRange && canThrow)
+            else if (distanceToPlayer <= throwRange && canThrow)
             {
                 PerformThrow();
             }
@@ -79,6 +80,8 @@ public class MiniMe : MonoBehaviour, IDamageable
         {
             Debug.LogWarning("NavMeshAgent is not on the NavMesh.");
         }
+
+        HandleAnimationState();  // Check and handle attack animation state
     }
 
     private void StopAndAttack()
@@ -113,6 +116,34 @@ public class MiniMe : MonoBehaviour, IDamageable
         }
     }
 
+    private void HandleAnimationState()
+    {
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        bool isInAttackAnimation = stateInfo.IsName("editable Melee");
+
+        if (damagePlayerScript != null && isInAttackAnimation)
+        {
+            if (!wasInAttackAnimation)
+            {
+                damagePlayerScript.enabled = true;
+                Debug.Log("BossEnemyDamagePlayer script activated.");
+            }
+
+            if (stateInfo.normalizedTime >= 0.98f)
+            {
+                damagePlayerScript.enabled = false;
+                Debug.Log("BossEnemyDamagePlayer script deactivated (animation complete).");
+            }
+        }
+        else if (damagePlayerScript.enabled)
+        {
+            damagePlayerScript.enabled = false;
+            Debug.Log("BossEnemyDamagePlayer script forcefully deactivated.");
+        }
+
+        wasInAttackAnimation = isInAttackAnimation;
+    }
+
     private IEnumerator AttackCooldownCoroutine()
     {
         isAttacking = true;
@@ -120,7 +151,6 @@ public class MiniMe : MonoBehaviour, IDamageable
         yield return new WaitForSeconds(attackCooldown);
         isAttacking = false;
         canAttack = true;
-      
     }
 
     private IEnumerator ThrowCooldownCoroutine()

@@ -7,10 +7,12 @@ public class SimpleEnemyAI : MonoBehaviour, IDamageable
 {
     public float maxHealth = 100f;
     private float currentHealth;
+
     private NavMeshAgent agent;
     private Transform player;
     private Animator animator;
     public float AgentSpeed = 2.5f;
+
     private bool isAttacking = false; // Flag to control attack state
 
     void Start()
@@ -19,6 +21,7 @@ public class SimpleEnemyAI : MonoBehaviour, IDamageable
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         animator = GetComponent<Animator>();
+
         agent.speed = AgentSpeed; // Set initial speed
     }
 
@@ -27,6 +30,7 @@ public class SimpleEnemyAI : MonoBehaviour, IDamageable
         if (agent.isOnNavMesh && !isAttacking)
         {
             float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
             if (distanceToPlayer < 8f)
             {
                 if (distanceToPlayer > 1.25f)
@@ -53,7 +57,7 @@ public class SimpleEnemyAI : MonoBehaviour, IDamageable
     private IEnumerator AttackCooldown()
     {
         isAttacking = true; // Set attacking state
-        
+
         yield return new WaitForSeconds(3f); // Wait for 3 seconds
         isAttacking = false; // Reset attacking state
     }
@@ -77,6 +81,7 @@ public class SimpleEnemyAI : MonoBehaviour, IDamageable
     {
         currentHealth -= damage;
         Debug.Log($"{gameObject.name} health: {currentHealth}/{maxHealth}");
+
         if (currentHealth <= 0)
         {
             Die();

@@ -25,6 +25,8 @@ public class playerController : MonoBehaviour
     private Animator animator; // Reference to the Animator component
     private AudioSource audiosource;
     public AudioClip KnifeThrow;
+    public ParticleSystem lightning;
+    public ParticleSystem clouds;
 
     // Start is called before the first frame update
     void Start()
@@ -34,6 +36,10 @@ public class playerController : MonoBehaviour
         inventory = GetComponent<PlayerInventory>();
         animator = GetComponent<Animator>(); // Initialize the Animator
         animator.SetBool("canRoll", true);
+        lightning = GameObject.Find("Lightning").GetComponent<ParticleSystem>();
+        clouds = GameObject.Find("Clouds").GetComponent<ParticleSystem>();
+        lightning.Play();
+        clouds.Play();
     }
 
     // Update is called once per frame

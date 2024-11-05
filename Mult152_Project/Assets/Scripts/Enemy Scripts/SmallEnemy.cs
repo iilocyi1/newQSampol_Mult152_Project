@@ -18,19 +18,46 @@ public class SmallEnemy : MonoBehaviour, IDamageable, IDifficultyAdjustable
     {
         currentHealth = maxHealth;
         agent = GetComponent<NavMeshAgent>();
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
         animator = GetComponent<Animator>();
 
-        DifficultyManager.instance.RegisterEnemy(this);
+        if (agent == null)
+        {
+            Debug.LogError("NavMeshAgent component not found.");
+        }
+
+        if (player == null)
+        {
+            Debug.LogError("Player not found. Make sure there is a GameObject with the tag 'Player' in the scene.");
+        }
+
+        if (animator == null)
+        {
+            Debug.LogError("Animator component not found.");
+        }
+
+        if (DifficultyManager.instance != null)
+        {
+            DifficultyManager.instance.RegisterEnemy(this);
+        }
+        else
+        {
+            Debug.LogError("DifficultyManager instance not found. Make sure it is initialized.");
+        }
     }
 
     void OnDestroy()
     {
-        DifficultyManager.instance.UnregisterEnemy(this);
+        if (DifficultyManager.instance != null)
+        {
+            DifficultyManager.instance.UnregisterEnemy(this);
+        }
     }
 
     void Update()
     {
+        if (player == null) return;
+
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= 12f && !isAttacking)
         {

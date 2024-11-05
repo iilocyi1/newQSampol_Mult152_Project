@@ -42,4 +42,20 @@ public class MediumEnemyDamagePlayer : MonoBehaviour
             playerInRange.TakeDamage(attackDamage); // Damage the player
         }
     }
+
+    // Method to start the coroutine
+    public void TriggerDamage()
+    {
+        StartCoroutine(DamageCoroutine());
+    }
+
+    // Coroutine to handle the damage
+    private IEnumerator DamageCoroutine()
+    {
+        // Wait for the specific frame or time in the animation
+        yield return new WaitForSeconds(0.5f); // Adjust the time as needed
+
+        // Call the DamagePlayer method
+        DamagePlayer();
+    }
 }

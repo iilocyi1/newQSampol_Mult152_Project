@@ -6280,7 +6280,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -7327338898555748978, guid: 993d34f73cc340e47bc8cc5360f41f9e, type: 3}
 --- !u!82 &382267706
@@ -58846,7 +58846,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9d6ae2d35d325f44a07129a70648d5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waveSpawner: {fileID: 0}
 --- !u!43 &1815758527
 Mesh:
   m_ObjectHideFlags: 0
@@ -62056,7 +62055,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 267165ef15bdaa94c886869b23a601d8, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.9
   m_Pitch: 1
   Loop: 1
   Mute: 0

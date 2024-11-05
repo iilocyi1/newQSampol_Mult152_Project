@@ -1927,6 +1927,7 @@ GameObject:
   - component: {fileID: 231659512944013959}
   - component: {fileID: -8369631957850118701}
   - component: {fileID: -3386839165906972629}
+  - component: {fileID: -2275212475001077965}
   m_Layer: 0
   m_Name: NewMedium
   m_TagString: Enemy
@@ -2048,6 +2049,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c68d7c6afb2d8841865c9ab4693dbab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-2275212475001077965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7446725396620171619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 210ee0e4a8c542641be2a2d6382e235a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackDamage: 10
 --- !u!1 &7603869343234434676
 GameObject:
   m_ObjectHideFlags: 0
@@ -2375,6 +2389,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8227179663865814010}
     m_Modifications:
+    - target: {fileID: 1755270347891995687, guid: b4c463c853a15a946841b9523b546f0f,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8556526569173075087, guid: b4c463c853a15a946841b9523b546f0f,
         type: 3}
       propertyPath: m_RootOrder
@@ -2435,7 +2454,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: Sword_Mesh 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8556526569173506223, guid: b4c463c853a15a946841b9523b546f0f,
+        type: 3}
+      propertyPath: m_TagString
+      value: Sword
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 1994257596898163860, guid: b4c463c853a15a946841b9523b546f0f, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b4c463c853a15a946841b9523b546f0f, type: 3}
 --- !u!4 &8897632894530988170 stripped
 Transform:
@@ -2443,22 +2468,3 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 992021641759910917}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &8897632894531286186 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8556526569173506223, guid: b4c463c853a15a946841b9523b546f0f,
-    type: 3}
-  m_PrefabInstance: {fileID: 992021641759910917}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &7006657597454743430
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8897632894531286186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 210ee0e4a8c542641be2a2d6382e235a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackDamage: 10

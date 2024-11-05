@@ -52,8 +52,8 @@ public class MediumEnemyDamagePlayer : MonoBehaviour
     // Coroutine to handle the damage
     private IEnumerator DamageCoroutine()
     {
-        // Wait for the specific frame or time in the animation
-        yield return new WaitForSeconds(0.5f); // Adjust the time as needed
+        // Wait for the end of the frame
+        yield return new WaitForEndOfFrame();
 
         // Call the DamagePlayer method
         DamagePlayer();

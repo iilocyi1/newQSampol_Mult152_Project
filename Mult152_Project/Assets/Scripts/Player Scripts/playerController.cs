@@ -88,7 +88,7 @@ public class playerController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.G))
             {
                 animator.SetTrigger("KunaiThrow"); // Trigger the throw animation
-                audiosource.PlayOneShot(KnifeThrow, 4f);
+              
             }
 
             // Trigger the roll animation

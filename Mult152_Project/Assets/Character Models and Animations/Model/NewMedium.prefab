@@ -1926,6 +1926,7 @@ GameObject:
   - component: {fileID: 4842139197832585594}
   - component: {fileID: 231659512944013959}
   - component: {fileID: -8369631957850118701}
+  - component: {fileID: -3386839165906972629}
   m_Layer: 0
   m_Name: NewMedium
   m_TagString: Enemy
@@ -2035,6 +2036,18 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!114 &-3386839165906972629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7446725396620171619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c68d7c6afb2d8841865c9ab4693dbab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7603869343234434676
 GameObject:
   m_ObjectHideFlags: 0

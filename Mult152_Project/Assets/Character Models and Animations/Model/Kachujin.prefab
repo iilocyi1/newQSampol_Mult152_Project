@@ -270,6 +270,7 @@ GameObject:
   - component: {fileID: -4669859658706760818}
   - component: {fileID: -5772804664228957549}
   - component: {fileID: 5594829482558728601}
+  - component: {fileID: 2633191324604615979}
   m_Layer: 0
   m_Name: Kachujin
   m_TagString: Enemy
@@ -399,6 +400,18 @@ CapsuleCollider:
   m_Height: 2.0002978
   m_Direction: 1
   m_Center: {x: -0.010847181, y: 1.0055858, z: 0}
+--- !u!114 &2633191324604615979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046447955973450208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c68d7c6afb2d8841865c9ab4693dbab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1211928210154283868
 GameObject:
   m_ObjectHideFlags: 0

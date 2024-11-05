@@ -129,7 +129,7 @@ public class MiniMe : MonoBehaviour, IDamageable
                 Debug.Log("BossEnemyDamagePlayer script activated.");
             }
 
-            if (stateInfo.normalizedTime >= 0.98f)
+            if (stateInfo.normalizedTime >= 1);
             {
                 damagePlayerScript.enabled = false;
                 Debug.Log("BossEnemyDamagePlayer script deactivated (animation complete).");

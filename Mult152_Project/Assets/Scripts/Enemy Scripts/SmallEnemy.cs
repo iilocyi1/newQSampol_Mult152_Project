@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class SmallEnemy : MonoBehaviour, IDamageable
+public class SmallEnemy : MonoBehaviour, IDamageable, IDifficultyAdjustable
 {
     public float maxHealth = 50f;
     private float currentHealth;
@@ -20,6 +20,13 @@ public class SmallEnemy : MonoBehaviour, IDamageable
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         animator = GetComponent<Animator>();
+
+        DifficultyManager.instance.RegisterEnemy(this);
+    }
+
+    void OnDestroy()
+    {
+        DifficultyManager.instance.UnregisterEnemy(this);
     }
 
     void Update()
@@ -86,5 +93,12 @@ public class SmallEnemy : MonoBehaviour, IDamageable
     public bool IsAttacking()
     {
         return isAttacking;
+    }
+
+    public void IncreaseDifficulty(float healthMultiplier, float speedMultiplier)
+    {
+        maxHealth *= healthMultiplier;
+        currentHealth = maxHealth; // Reset current health to new max health
+        agent.speed *= speedMultiplier;
     }
 }

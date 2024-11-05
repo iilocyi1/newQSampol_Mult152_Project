@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class SimpleEnemyAI : MonoBehaviour, IDamageable
+public class SimpleEnemyAI : MonoBehaviour, IDamageable, IDifficultyAdjustable
 {
     public float maxHealth = 100f;
     private float currentHealth;
@@ -23,6 +23,13 @@ public class SimpleEnemyAI : MonoBehaviour, IDamageable
         animator = GetComponent<Animator>();
 
         agent.speed = AgentSpeed; // Set initial speed
+
+        DifficultyManager.instance.RegisterEnemy(this);
+    }
+
+    void OnDestroy()
+    {
+        DifficultyManager.instance.UnregisterEnemy(this);
     }
 
     void Update()
@@ -92,5 +99,13 @@ public class SimpleEnemyAI : MonoBehaviour, IDamageable
     {
         Debug.Log($"{gameObject.name} died!");
         gameObject.SetActive(false);
+    }
+
+    public void IncreaseDifficulty(float healthMultiplier, float speedMultiplier)
+    {
+        maxHealth *= healthMultiplier;
+        currentHealth = maxHealth; // Reset current health to new max health
+        AgentSpeed *= speedMultiplier;
+        agent.speed = AgentSpeed; // Update agent speed
     }
 }

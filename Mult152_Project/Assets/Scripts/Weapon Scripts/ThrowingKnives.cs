@@ -7,7 +7,7 @@ public class ThrowingKnives : MonoBehaviour
     public float speed = 15.0f; // Speed at which the knife moves forward
     public int damage = 20; // Damage dealt by the knife
     private AudioSource audioSource;
-    public AudioClip KnifeHit;
+
 
 
     void Start()
@@ -31,7 +31,7 @@ public class ThrowingKnives : MonoBehaviour
             if (damageable != null)
             {
                 damageable.TakeDamage(damage);
-                audioSource.PlayOneShot(KnifeHit, 4f);
+           
            
                 Debug.Log("Knife hit an enemy!");
             }

@@ -333,7 +333,7 @@ MonoBehaviour:
   detectionRange: 10
   damage: 10
   player: {fileID: 0}
-  maintainDistance: 3
+  maintainDistance: 5
 --- !u!114 &4311285016955833472
 MonoBehaviour:
   m_ObjectHideFlags: 0

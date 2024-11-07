@@ -19,18 +19,17 @@ public class MiniMe : MonoBehaviour, IDamageable
     public float throwRange = 5f;
     public float throwCooldown = 8f;
     public float attackCooldown = 3f;
+    public float speed = 15f;
 
     private bool isEnemy = false;
     private bool isDialogueActive = false;
     private bool isAttacking = false;
     private bool canAttack = true;
     private bool canThrow = true;
-    private bool wasInAttackAnimation = false;  // Track previous animation state
 
     private NavMeshAgent agent;
     private Transform player;
     private Animator animator;
-    private BossEnemyDamagePlayer damagePlayerScript;
 
     void Start()
     {
@@ -43,11 +42,6 @@ public class MiniMe : MonoBehaviour, IDamageable
         player = GameObject.FindGameObjectWithTag("Player").transform;
         animator = GetComponent<Animator>();
 
-        damagePlayerScript = GetComponentInChildren<BossEnemyDamagePlayer>();
-        if (damagePlayerScript != null)
-        {
-            damagePlayerScript.enabled = false;
-        }
     }
 
     void Update()
@@ -80,8 +74,6 @@ public class MiniMe : MonoBehaviour, IDamageable
         {
             Debug.LogWarning("NavMeshAgent is not on the NavMesh.");
         }
-
-        HandleAnimationState();  // Check and handle attack animation state
     }
 
     private void StopAndAttack()
@@ -96,6 +88,9 @@ public class MiniMe : MonoBehaviour, IDamageable
     {
         agent.isStopped = true;
         animator.SetBool("isWalking", false);
+        Vector3 directionToPlayer = (player.position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToPlayer.x, 0, directionToPlayer.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
         animator.SetTrigger("Throw");
         StartCoroutine(ThrowCooldownCoroutine());
     }
@@ -104,45 +99,21 @@ public class MiniMe : MonoBehaviour, IDamageable
     {
         if (projectilePrefab != null && rockSpawnPoint != null && player != null)
         {
+            // Instantiate the rock
             GameObject rock = Instantiate(projectilePrefab, rockSpawnPoint.position, Quaternion.identity);
             Rigidbody rockRb = rock.GetComponent<Rigidbody>();
 
-            if (rockRb != null)
-            {
-                // Calculate direction towards the player
-                Vector3 directionToPlayer = (player.position - rockSpawnPoint.position).normalized;
-                rockRb.AddForce(directionToPlayer * 10f, ForceMode.Impulse);  // Adjust force as needed
-            }
+            
+            Vector3 directionToPlayer = (player.position - rock.transform.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToPlayer.x, 0, directionToPlayer.z));
+            rock.transform.rotation = lookRotation;
+
+            rockRb.AddForce(directionToPlayer * speed, ForceMode.Impulse);
         }
     }
 
-    private void HandleAnimationState()
-    {
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-        bool isInAttackAnimation = stateInfo.IsName("editable Melee");
 
-        if (damagePlayerScript != null && isInAttackAnimation)
-        {
-            if (!wasInAttackAnimation)
-            {
-                damagePlayerScript.enabled = true;
-                Debug.Log("BossEnemyDamagePlayer script activated.");
-            }
 
-            if (stateInfo.normalizedTime >= 1);
-            {
-                damagePlayerScript.enabled = false;
-                Debug.Log("BossEnemyDamagePlayer script deactivated (animation complete).");
-            }
-        }
-        else if (damagePlayerScript.enabled)
-        {
-            damagePlayerScript.enabled = false;
-            Debug.Log("BossEnemyDamagePlayer script forcefully deactivated.");
-        }
-
-        wasInAttackAnimation = isInAttackAnimation;
-    }
 
     private IEnumerator AttackCooldownCoroutine()
     {

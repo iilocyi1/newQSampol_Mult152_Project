@@ -27,6 +27,7 @@ public class playerController : MonoBehaviour
     public AudioClip KnifeThrow;
     public ParticleSystem lightning;
     public ParticleSystem clouds;
+    private bool isInTrigger = false; // Flag to check if in trigger
 
     // Start is called before the first frame update
     void Start()
@@ -47,8 +48,19 @@ public class playerController : MonoBehaviour
     {
         if (!isBlocking) // Check if not blocking
         {
-            lrInput = Input.GetAxis("Horizontal");
-            udInput = Input.GetAxis("Vertical");
+            if (isInTrigger)
+            {
+                // Adjust controls for the new camera orientation
+                lrInput = -Input.GetAxis("Vertical");
+                udInput = Input.GetAxis("Horizontal");
+            }
+            else
+            {
+                // Original controls
+                lrInput = Input.GetAxis("Horizontal");
+                udInput = Input.GetAxis("Vertical");
+            }
+
             jumpInput = Input.GetKeyDown(KeyCode.Space);
 
             // Update Animator parameters
@@ -88,7 +100,6 @@ public class playerController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.G))
             {
                 animator.SetTrigger("KunaiThrow"); // Trigger the throw animation
-              
             }
 
             // Trigger the roll animation
@@ -202,6 +213,22 @@ public class playerController : MonoBehaviour
                     hit.collider.GetComponent<Gate>().OpenGate();
                 }
             }
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("isTriggerCamera"))
+        {
+            isInTrigger = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("isTriggerCamera"))
+        {
+            isInTrigger = false;
         }
     }
 }

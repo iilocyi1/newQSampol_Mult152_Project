@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MediumEnemyDamagePlayer : MonoBehaviour
+public class BossEnemyDamagePlayer : MonoBehaviour
 {
-    public int attackDamage = 10; // Damage to deal to the player
-    private Player playerInRange; // Store player reference when inside trigger
+    public int attackDamage = 20;
+    private Player playerInRange;
 
     void Start()
     {
@@ -19,7 +19,6 @@ public class MediumEnemyDamagePlayer : MonoBehaviour
         if (player != null)
         {
             playerInRange = player; // Store player reference
-            Debug.Log("Player entered the trigger.");
         }
     }
 
@@ -29,21 +28,23 @@ public class MediumEnemyDamagePlayer : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = null; // Clear the reference
-            Debug.Log("Player exited the trigger.");
+
         }
     }
 
-    // Method to damage the player, called from the animation event
-    public void DamagePlayer()
+    private void OnCollisionEnter(Collision collision)
     {
-        if (playerInRange != null)
+
+        if (collision.gameObject.CompareTag("Axe"))
         {
-            Debug.Log("Player hit! Applying damage.");
-            playerInRange.TakeDamage(attackDamage); // Damage the player
+            if (playerInRange != null)
+            {
+
+                playerInRange.TakeDamage(attackDamage);
+            }
         }
     }
 
-    // Method to start the coroutine
     public void TriggerDamage()
     {
         StartCoroutine(DamageCoroutine());
@@ -55,7 +56,15 @@ public class MediumEnemyDamagePlayer : MonoBehaviour
         // Wait for the end of the frame
         yield return new WaitForEndOfFrame();
 
-        // Call the DamagePlayer method
+
         DamagePlayer();
+    }
+
+    private void DamagePlayer()
+    {
+        if (playerInRange != null)
+        {
+            playerInRange.TakeDamage(attackDamage);
+        }
     }
 }

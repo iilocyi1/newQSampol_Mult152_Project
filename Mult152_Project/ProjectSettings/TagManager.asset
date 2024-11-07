@@ -9,6 +9,9 @@ TagManager:
   - Enemy
   - Key
   - Ground
+  - Sword
+  - Axe
+  - isTriggerCamera
   layers:
   - Default
   - TransparentFX

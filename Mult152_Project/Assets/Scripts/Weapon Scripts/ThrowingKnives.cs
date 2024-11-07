@@ -39,10 +39,10 @@ public class ThrowingKnives : MonoBehaviour
             // Destroy the knife after hitting an enemy
             Destroy(gameObject);
         }
-        else if (other.CompareTag("Obstacle"))
-        {
+ 
+       
             // Destroy the knife if it hits an obstacle
             Destroy(gameObject);
-        }
+    
     }
 }

@@ -11,7 +11,7 @@ public class adaptiveAISmallEnemy : MonoBehaviour, IDamageable
     public float damage = 10f;
     public Transform player;
     protected NavMeshAgent agent;
-    public float maintainDistance = 3f; // Distance to maintain from the player
+    public float maintainDistance = 5f; // Distance to maintain from the player
 
     protected virtual void Start()
     {
@@ -38,6 +38,11 @@ public class adaptiveAISmallEnemy : MonoBehaviour, IDamageable
                     Vector3 directionAwayFromPlayer = (transform.position - player.position).normalized;
                     Vector3 newPosition = transform.position + directionAwayFromPlayer * maintainDistance;
                     agent.SetDestination(newPosition);
+
+                    // Rotate to face the player
+                    Vector3 directionToPlayer = (player.position - transform.position).normalized;
+                    Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToPlayer.x, 0, directionToPlayer.z));
+                    transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f); // Smooth rotation
                 }
                 OnPlayerDetected();
             }
